@@ -23,6 +23,11 @@ body {
     padding: 0;
 }
 
+main {
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
 h2 {
     text-align: center;
     margin: 20px 0;
@@ -55,7 +60,7 @@ h2 {
 }
 
 .product-table a {
-    color: #007bff; 
+    color: #2a5e97; 
     text-decoration: none; 
 }
 
@@ -75,5 +80,10 @@ footer {
     text-align: center;
     padding: 1em;
     color: #fff; 
-    text-decoration: none; 
 }
+
+footer a {
+    text-decoration: none;
+    color: #fff;
+}
+

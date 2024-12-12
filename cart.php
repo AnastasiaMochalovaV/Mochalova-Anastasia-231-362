@@ -1,37 +1,26 @@
 <?php
-session_start();
 include 'database.php';
+session_start();
 
-// Проверка, есть ли товары в корзине
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
 }
 
-// Добавление товара в корзину
-if (isset($_GET['add'])) {
-    $productId = intval($_GET['add']);
-    if (!in_array($productId, $_SESSION['cart'])) {
-        $_SESSION['cart'][] = $productId;
-    }
-}
-
-// Удаление товара из корзины
-if (isset($_GET['remove'])) {
-    $productId = intval($_GET['remove']);
-    if (($key = array_search($productId, $_SESSION['cart'])) !== false) {
-        unset($_SESSION['cart'][$key]);
-    }
-}
-
-// Получение товаров из корзины
+$user_id = $_SESSION['user_id'];
 $cartItems = [];
-if (!empty($_SESSION['cart'])) {
-    $ids = implode(',', $_SESSION['cart']);
-    $query = "SELECT * FROM products WHERE id IN ($ids)";
-    $result = $mysqli->query($query);
-    while ($product = $result->fetch_assoc()) {
-        $cartItems[] = $product;
-    }
+
+$query = "SELECT c.product_id, c.quantity, p.name, p.price, p.image 
+          FROM cart c 
+          JOIN products p ON c.product_id = p.id 
+          WHERE c.user_id = ?";
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+while ($item = $result->fetch_assoc()) {
+    $cartItems[] = $item;
 }
 ?>
 
@@ -46,7 +35,24 @@ if (!empty($_SESSION['cart'])) {
 </head>
 
 <body>
-    <?php include 'header.php'; ?>
+    <header>
+        <div class="navbar">
+            <a href="index.php" class="logo">
+                <img src="images/logo.png" alt="Мой Магазин" style="height: 15px;">
+            </a>
+            <nav id="auth-links">
+                <a href="index.php">Главная</a>
+                <a href="shop.php">Каталог</a>
+                <a href="cart.php">Корзина</a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="logout.php">Выход</a>
+                <?php else: ?>
+                    <a href="login.php">Авторизация</a>
+                    <a href="register.php">Регистрация</a>
+                <?php endif; ?>
+            </nav>
+        </div>
+    </header>
 
     <main>
         <h2>Корзина</h2>
@@ -58,23 +64,29 @@ if (!empty($_SESSION['cart'])) {
                     <th>Изображение</th>
                     <th>Название</th>
                     <th>Цена</th>
+                    <th>Количество</th>
+                    <th>Итого</th>
                     <th>Действия</th>
                 </tr>
                 <?php foreach ($cartItems as $item): ?>
                     <tr>
-                        <td><img src='../images/<?php echo $item['image']; ?>' alt='<?php echo $item['name']; ?>' width='100'></td>
+                        <td><img src="images/<?php echo $item['image']; ?>" alt="<?php echo $item['name']; ?>" width="100"></td>
                         <td><?php echo $item['name']; ?></td>
                         <td><?php echo $item['price']; ?> руб.</td>
+                        <td><?php echo $item['quantity']; ?></td>
+                        <td><?php echo $item['price'] * $item['quantity']; ?> руб.</td>
                         <td>
-                            <a href='cart.php?remove=<?php echo $item['id']; ?>'>Удалить</a>
+                            <form action="update_cart.php" method="POST">
+                                <input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
+                                <input type="number" name="quantity" min="1" max="<?php echo $item['quantity']; ?>" value="1">
+                                <button type="submit">Удалить</button>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </table>
         <?php endif; ?>
     </main>
-
-    <?php include 'footer.php'; ?>
 </body>
 
 </html>

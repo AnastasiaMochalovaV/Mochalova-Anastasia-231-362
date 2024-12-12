@@ -1,5 +1,6 @@
 <?php
 include 'database.php';
+session_start();
 ?>
 
 <!DOCTYPE html>
@@ -10,13 +11,54 @@ include 'database.php';
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Главная - Магазин</title>
   <link rel="stylesheet" href="styles/main.css">
-  <script src="script.js" defer></script>
+  <script defer>
+    window.onload = function () {
+      const modal = document.getElementById("successModal");
+      if (modal) {
+        modal.style.display = "block";
+      }
+    };
+
+    function closeModal() {
+      const modal = document.getElementById("successModal");
+      if (modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
 </head>
 
 <body>
-  <?php include 'header.php'; ?>
+  <header>
+    <div class="navbar">
+      <a href="index.php" class="logo">
+        <img src="images/logo.png" alt="Мой Магазин" style="height: 15px;">
+      </a>
+      <nav id="auth-links">
+        <a href="index.php">Главная</a>
+        <a href="shop.php">Каталог</a>
+        <a href="cart.php">Корзина</a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <a href="logout.php">Выход</a>
+        <?php else: ?>
+          <a href="login.php">Авторизация</a>
+          <a href="register.php">Регистрация</a>
+        <?php endif; ?>
+      </nav>
+    </div>
+  </header>
 
   <main>
+    <?php if (isset($_SESSION['success_message'])): ?>
+      <div id="successModal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeModal()">&times;</span>
+          <p><?php echo $_SESSION['success_message']; ?></p>
+        </div>
+      </div>
+      <?php unset($_SESSION['success_message']); ?>
+    <?php endif; ?>
+
     <section class="hero">
       <div class="hero-content">
         <h1>Цветы - Язык сердец, расцветай с нами</h1>
@@ -49,5 +91,3 @@ include 'database.php';
 
   <?php include 'footer.php'; ?>
 </body>
-
-</html>

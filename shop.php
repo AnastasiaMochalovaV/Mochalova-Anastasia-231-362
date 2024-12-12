@@ -1,5 +1,6 @@
 <?php
 include 'database.php';
+session_start();
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +14,24 @@ include 'database.php';
 </head>
 
 <body>
-    <?php include 'header.php'; ?>
+    <header>
+        <div class="navbar">
+            <a href="index.php" class="logo">
+                <img src="images/logo.png" alt="Мой Магазин" style="height: 15px;">
+            </a>
+            <nav id="auth-links">
+                <a href="index.php">Главная</a>
+                <a href="shop.php">Каталог</a>
+                <a href="cart.php">Корзина</a>
+                <?php if (isset($_SESSION['user'])): ?>
+                    <a href="logout.php">Выход</a>
+                <?php else: ?>
+                    <a href="login.php">Авторизация</a>
+                    <a href="register.php">Регистрация</a>
+                <?php endif; ?>
+            </nav>
+        </div>
+    </header>
 
     <main>
         <h2>Каталог товаров</h2>
@@ -25,11 +43,9 @@ include 'database.php';
                 <th>Описание</th>
             </tr>
             <?php
-            // Получение списка товаров
             $query = "SELECT * FROM products";
             $result = $mysqli->query($query);
 
-            // Проверка на наличие товаров
             if ($result && $result->num_rows > 0) {
                 while ($product = $result->fetch_assoc()) {
                     echo "
@@ -42,7 +58,7 @@ include 'database.php';
                     ";
                 }
             } else {
-                echo "<tr><td colspan='4'>Товары не найдены.</td></tr>"; // Сообщение, если товаров нет
+                echo "<tr><td colspan='4'>Товары не найдены.</td></tr>";
             }
             ?>
         </table>

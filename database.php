@@ -1,8 +1,8 @@
 <?php
 // Настройки для подключения к базе данных
 $host = 'localhost';       // Сервер базы данных
-$db_user = 'newadmin';     // Имя пользователя MySQL
-$db_password = 'password'; // Пароль для MySQL
+$db_user = 'mchnsv';     // Имя пользователя MySQL
+$db_password = 'admin'; // Пароль для MySQL
 $db_name = 'shop';         // Имя базы данных
 
 // Создаем подключение к базе данных
